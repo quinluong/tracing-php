@@ -26,8 +26,6 @@ class TagNameEnum {
 
   const HTTP_URL_PATH = 'http.url.path'; // HTTP URL path
 
-  const HTTP_PORT = 'http.port';
-
   const HTTP_PROTOCOL_VERSION = 'http.protocol_version';
 
   const PEER_SERVICE = 'peer.service'; // Remote service name (for some unspecified definition of "service"). E.g., "elasticsearch", "a_custom_microservice", "memcache"
@@ -45,5 +43,7 @@ class TagNameEnum {
   const DB_STATEMENT = 'db.statement'; // A database statement for the given database type. E.g., for db.type="sql", "SELECT * FROM wuser_table"; for db.type="redis", "SET mykey 'WuValue'"
 
   const DB_USER = 'db.user'; // Username for accessing database. E.g., "readonly_user" or "reporting_user"
+
+  const CACHE_STATUS = 'cache.status';
 
 }

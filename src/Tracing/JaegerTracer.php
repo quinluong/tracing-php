@@ -190,4 +190,16 @@ class JaegerTracer implements TracerInterface {
     $this->_isPaused = false;
   }
 
+  public function getTraceId(SpanContext $spanContext) {
+    $strTraceId = '';
+
+    if (method_exists($spanContext, 'traceIdLowToString')
+      && $spanContext->traceIdLowToString() !== null
+      && is_string($spanContext->traceIdLowToString())) {
+      $strTraceId = trim($spanContext->traceIdLowToString());
+    }
+
+    return $strTraceId;
+  }
+
 }

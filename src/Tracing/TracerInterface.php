@@ -96,4 +96,6 @@ interface TracerInterface {
 
   public function resume();
 
+  public function getTraceId(SpanContext $spanContext);
+
 }
