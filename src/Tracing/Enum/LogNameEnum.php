@@ -20,4 +20,8 @@ class LogNameEnum {
 
   const HTTP_RESPONSE_DATA = 'http.resp.data';
 
+  const RPC_REQUEST_PARAM = 'rpc.req.param';
+
+  const RPC_RESPONSE_DATA = 'rpc.resp.data';
+
 }
