@@ -12,6 +12,10 @@ class LogNameEnum {
 
   const ERROR_STACK = 'error.stack'; // A stack trace in platform-conventional format; may or may not pertain to an error. E.g., "File \"example.py\", line 7, in \<module\>\ncaller()\nFile \"example.py\", line 5, in caller\ncallee()\nFile \"example.py\", line 2, in callee\nraise Exception(\"Yikes\")\n"
 
+  const REQUEST_PARAM = 'req.param';
+
+  const RESPONSE_DATA = 'resp.data';
+
   const HTTP_REQUEST_HEADER = 'http.req.header';
 
   const HTTP_REQUEST_PARAM = 'http.req.param';

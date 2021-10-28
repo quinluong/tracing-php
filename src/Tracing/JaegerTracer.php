@@ -6,6 +6,7 @@ use Jaeger\Config;
 use Jaeger\Constants;
 use Jaeger\Sampler\ConstSampler;
 use Jaeger\Sampler\ProbabilisticSampler;
+use OpenTracing\Span;
 use OpenTracing\SpanContext;
 use Tracing\Custom\NoopTracer;
 use Tracing\TracerInterface;
@@ -151,35 +152,37 @@ class JaegerTracer implements TracerInterface {
     return $tracer->extract($format, $carrier);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function flush() {
+  public function checkThenFlush(bool $limitTagSize, bool $limitLogSize) {
     $tracer = $this->_getTracer();
 
-    $arrSpan = $tracer->getSpans();
+    if ($limitTagSize === true || $limitLogSize === true) {
+      $arrSpan = $tracer->getSpans();
 
-    if (count($arrSpan) > 0) {
-      foreach ($arrSpan as $span) {
-        if (count($span->tags) > 0) {
-          if (SizeUtil::exceedSizeInBytes($span->tags, SizeUtil::MAX_TAG_SIZE_PER_SPAN_IN_BYTES)) {
-            $span->tags = [];
-
-            throw new \Exception('There is one span has tags data exceeds the limit size, maximum size is ' . SizeUtil::MAX_TAG_SIZE_PER_SPAN_IN_BYTES . 'B. Clear tags data automatically.', -1);
+      if (count($arrSpan) > 0) {
+        foreach ($arrSpan as $span) {
+          if ($limitTagSize === true && count($span->tags) > 0) {
+            if (SizeUtil::exceedSizeInBytes($span->tags, SizeUtil::MAX_TAG_SIZE_PER_SPAN_IN_BYTES)) {
+              throw new \Exception('There is one span has tags data exceeds the limit size, maximum size is ' . SizeUtil::MAX_TAG_SIZE_PER_SPAN_IN_BYTES . 'B.', -1);
+            }
           }
-        }
 
-        if (count($span->logs) > 0) {
-          if (SizeUtil::exceedSizeInBytes($span->logs, SizeUtil::MAX_LOG_SIZE_PER_SPAN_IN_BYTES)) {
-            $span->logs = [];
-
-            throw new \Exception('There is one span has logs data exceeds the limit size, maximum size is ' . SizeUtil::MAX_LOG_SIZE_PER_SPAN_IN_BYTES . 'B. Clear logs data automatically.', -1);
+          if ($limitLogSize === true && count($span->logs) > 0) {
+            if (SizeUtil::exceedSizeInBytes($span->logs, SizeUtil::MAX_LOG_SIZE_PER_SPAN_IN_BYTES)) {
+              throw new \Exception('There is one span has logs data exceeds the limit size, maximum size is ' . SizeUtil::MAX_LOG_SIZE_PER_SPAN_IN_BYTES . 'B.', -1);
+            }
           }
         }
       }
     }
 
     $tracer->flush();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function flush() {
+    $this->checkThenFlush(true, true);
   }
 
   public function pause() {
@@ -200,6 +203,30 @@ class JaegerTracer implements TracerInterface {
     }
 
     return $strTraceId;
+  }
+
+  public function getSpanDuration(Span $span) {
+    if (property_exists($span, 'duration')) {
+      return $span->duration;
+    }
+
+    return 0;
+  }
+
+  public function getAllSpanDurations() {
+    $tracer = $this->_getTracer();
+
+    $arrSpan = $tracer->getSpans();
+
+    $duration = 0;
+
+    if (count($arrSpan) > 0) {
+      foreach ($arrSpan as $span) {
+        $duration += $this->getSpanDuration($span);
+      }
+    }
+
+    return $duration;
   }
 
 }
