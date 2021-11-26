@@ -2,6 +2,7 @@
 
 namespace Tracing;
 
+use OpenTracing\Span;
 use OpenTracing\SpanContext;
 
 interface TracerInterface {
@@ -77,6 +78,8 @@ interface TracerInterface {
    */
   public function extract($format, $carrier);
 
+  public function checkThenFlush(bool $limitTagSize, bool $limitLogSize);
+
   /**
    * Allow tracer to send span data to be instrumented.
    *
@@ -97,5 +100,9 @@ interface TracerInterface {
   public function resume();
 
   public function getTraceId(SpanContext $spanContext);
+
+  public function getSpanDuration(Span $span);
+
+  public function getAllSpanDurations();
 
 }
